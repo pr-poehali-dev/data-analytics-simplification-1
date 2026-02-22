@@ -27,10 +27,10 @@ export default function Hero() {
 
       <div className="relative z-10 text-center text-white">
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
-          ОТКРОЙ
+          TELEGRAM BOT
         </h1>
         <p className="text-lg md:text-xl max-w-2xl mx-auto px-6 opacity-90">
-          Исследуй границы дизайна с иммерсивным параллакс-эффектом
+          Автоматизируй своё дело — умный бот, который работает за тебя 24/7
         </p>
       </div>
     </div>
