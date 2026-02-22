@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -9,11 +8,28 @@ import { AnimatePresence } from "framer-motion";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AuthModal from "./components/AuthModal";
+import AdminPanel from "./components/AdminPanel";
 
 const queryClient = new QueryClient();
 
+interface User {
+  username: string;
+  isAdmin: boolean;
+}
+
 const App = () => {
-  const [authDone, setAuthDone] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [activePromo, setActivePromo] = useState({ code: "VIP50", discount: 50 });
+
+  const handleAuth = (u?: User) => {
+    if (u) setUser(u);
+    else setUser({ username: "Гость", isAdmin: false });
+  };
+
+  const handlePromoChange = (code: string, discount: number) => {
+    setActivePromo({ code, discount });
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -21,12 +37,30 @@ const App = () => {
         <Toaster />
         <Sonner />
         <AnimatePresence>
-          {!authDone && <AuthModal onClose={() => setAuthDone(true)} />}
+          {!user && <AuthModal onClose={handleAuth} />}
+        </AnimatePresence>
+        <AnimatePresence>
+          {showAdmin && user?.isAdmin && (
+            <AdminPanel
+              onClose={() => setShowAdmin(false)}
+              onPromoChange={handlePromoChange}
+            />
+          )}
         </AnimatePresence>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route
+              path="/"
+              element={
+                <Index
+                  username={user?.username}
+                  isAdmin={user?.isAdmin}
+                  onAdminClick={() => setShowAdmin(true)}
+                  promoCode={activePromo.code}
+                  promoDiscount={activePromo.discount}
+                />
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -1,0 +1,188 @@
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const CATEGORIES = ["Все", "Оружие", "Броня", "Привилегии", "Ресурсы", "Питомцы"];
+
+const ITEMS = [
+  { id: 1, emoji: "⚔️", name: "Меч Дракона", category: "Оружие", price: 299, oldPrice: 499, rarity: "legendary", desc: "Урон +500%, поджигает врагов", tag: "ХИТ" },
+  { id: 2, emoji: "🛡️", name: "Щит Нефрита", category: "Броня", price: 199, oldPrice: null, rarity: "epic", desc: "Блокирует 80% урона", tag: null },
+  { id: 3, emoji: "💎", name: "Алмазная броня", category: "Броня", price: 399, oldPrice: 599, rarity: "legendary", desc: "Полный сет + зачарования", tag: "СКИДКА" },
+  { id: 4, emoji: "👑", name: "VIP статус", category: "Привилегии", price: 149, oldPrice: null, rarity: "rare", desc: "30 дней особых прав на сервере", tag: null },
+  { id: 5, emoji: "🪄", name: "Жезл молний", category: "Оружие", price: 249, oldPrice: 349, rarity: "epic", desc: "Призывает молнию в точку удара", tag: "НОВИНКА" },
+  { id: 6, emoji: "🐉", name: "Питомец Дракон", category: "Питомцы", price: 599, oldPrice: null, rarity: "legendary", desc: "Летающий дракон сопровождает тебя", tag: "РЕДКИЙ" },
+  { id: 7, emoji: "🪨", name: "Запас алмазов", category: "Ресурсы", price: 89, oldPrice: null, rarity: "common", desc: "64 алмаза в инвентарь сразу", tag: null },
+  { id: 8, emoji: "🏹", name: "Лук снайпера", category: "Оружие", price: 179, oldPrice: 220, rarity: "rare", desc: "+300% дальность, без разброса", tag: null },
+  { id: 9, emoji: "🐺", name: "Питомец Волк", category: "Питомцы", price: 199, oldPrice: null, rarity: "rare", desc: "Защищает хозяина в бою", tag: null },
+];
+
+const RARITY_COLORS: Record<string, string> = {
+  common: "#94a3b8",
+  rare: "#3b82f6",
+  epic: "#a855f7",
+  legendary: "#fbbf24",
+};
+
+const RARITY_LABELS: Record<string, string> = {
+  common: "Обычный",
+  rare: "Редкий",
+  epic: "Эпический",
+  legendary: "Легендарный",
+};
+
+interface ShopProps {
+  promoCode?: string;
+  promoDiscount?: number;
+}
+
+export default function Shop({ promoCode, promoDiscount = 0 }: ShopProps) {
+  const [category, setCategory] = useState("Все");
+  const [promo, setPromo] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState("");
+  const [cart, setCart] = useState<number[]>([]);
+  const [bought, setBought] = useState<number | null>(null);
+  const [promoError, setPromoError] = useState("");
+
+  const filtered = ITEMS.filter(i => category === "Все" || i.category === category);
+  const discount = appliedPromo === promoCode && promoCode ? promoDiscount : 0;
+
+  const applyPromo = () => {
+    if (!promo.trim()) return setPromoError("Введите промокод");
+    if (promo.toUpperCase() === promoCode?.toUpperCase()) {
+      setAppliedPromo(promo.toUpperCase());
+      setPromoError("");
+    } else {
+      setPromoError("Промокод не найден");
+      setAppliedPromo("");
+    }
+  };
+
+  const handleBuy = (id: number) => {
+    setBought(id);
+    setCart(c => [...c, id]);
+    setTimeout(() => setBought(null), 2000);
+  };
+
+  const finalPrice = (price: number) => {
+    if (discount > 0) return Math.round(price * (1 - discount / 100));
+    return price;
+  };
+
+  return (
+    <div id="shop" className="min-h-screen pt-24 pb-16 px-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Title */}
+        <div className="text-center mb-10">
+          <h2 className="font-mc text-3xl md:text-5xl font-black text-white mb-2">🛒 МАГАЗИН</h2>
+          <p className="text-slate-500 text-sm">Выбери предмет и улучши своего персонажа</p>
+        </div>
+
+        {/* Promo code */}
+        <div className="mc-panel p-4 mb-8 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          <span className="text-yellow-400 text-sm font-bold uppercase tracking-widest shrink-0">🎟️ Промокод:</span>
+          <div className="flex gap-2 flex-1">
+            <input
+              value={promo}
+              onChange={e => setPromo(e.target.value.toUpperCase())}
+              placeholder="ВВЕДИТЕ КОД"
+              className="mc-input px-3 py-2 text-sm flex-1 uppercase tracking-widest"
+            />
+            <button onClick={applyPromo} className="mc-btn px-4 py-2 text-xs font-bold uppercase tracking-widest text-black shrink-0" style={{ background: "#fbbf24" }}>
+              Применить
+            </button>
+          </div>
+          {appliedPromo && (
+            <span className="text-green-400 text-xs font-bold">✅ -{discount}% применено!</span>
+          )}
+          {promoError && (
+            <span className="text-red-400 text-xs">❌ {promoError}</span>
+          )}
+        </div>
+
+        {/* Categories */}
+        <div className="flex flex-wrap gap-2 mb-8">
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setCategory(cat)}
+              className="px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all duration-150"
+              style={{
+                background: category === cat ? "#4ade80" : "#1e293b",
+                color: category === cat ? "#000" : "#64748b",
+                border: `2px solid ${category === cat ? "#4ade80" : "#334155"}`,
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Items grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <AnimatePresence mode="popLayout">
+            {filtered.map((item, i) => (
+              <motion.div
+                key={item.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ delay: i * 0.05 }}
+                className="mc-panel p-4 flex flex-col gap-3 hover:brightness-110 transition-all duration-200 cursor-default"
+                style={{ borderColor: RARITY_COLORS[item.rarity] }}
+              >
+                {/* Top row */}
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="text-4xl">{item.emoji}</div>
+                    <div>
+                      <div className="font-bold text-white text-sm leading-tight">{item.name}</div>
+                      <div className="text-xs font-bold mt-0.5" style={{ color: RARITY_COLORS[item.rarity] }}>
+                        {RARITY_LABELS[item.rarity]}
+                      </div>
+                    </div>
+                  </div>
+                  {item.tag && (
+                    <span className="text-xs font-black px-2 py-0.5 text-black shrink-0"
+                      style={{ background: item.tag === "ЛЕГЕНДАРНЫЙ" || item.tag === "РЕДКИЙ" ? "#fbbf24" : item.tag === "НОВИНКА" ? "#22d3ee" : "#4ade80" }}
+                    >
+                      {item.tag}
+                    </span>
+                  )}
+                </div>
+
+                {/* Description */}
+                <p className="text-slate-500 text-xs leading-relaxed">{item.desc}</p>
+
+                {/* Price + Buy */}
+                <div className="flex items-center justify-between mt-auto">
+                  <div>
+                    {item.oldPrice && (
+                      <div className="text-slate-600 text-xs line-through">{item.oldPrice} ₽</div>
+                    )}
+                    <div className="text-white font-black text-lg">
+                      {discount > 0 ? (
+                        <>
+                          <span className="text-green-400">{finalPrice(item.price)} ₽</span>
+                          <span className="text-slate-600 text-sm line-through ml-2">{item.price} ₽</span>
+                        </>
+                      ) : (
+                        <>{item.price} ₽</>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleBuy(item.id)}
+                    className="mc-btn px-4 py-2 text-xs font-bold uppercase tracking-widest text-black"
+                    style={{ background: bought === item.id ? "#22d3ee" : "#4ade80" }}
+                  >
+                    {bought === item.id ? "✅ Куплено!" : "Купить"}
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+}
