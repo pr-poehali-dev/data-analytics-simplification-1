@@ -7,7 +7,8 @@ const FEATURES = [
   { icon: "♻️", title: "Гарантия возврата", desc: "Вернём деньги, если предмет не был выдан в течение часа" },
 ];
 
-export default function Featured() {
+interface FeaturedProps { serverIp?: string; primaryColor?: string; }
+export default function Featured({ serverIp = "play.craftstore.ru", primaryColor = "#4ade80" }: FeaturedProps) {
   return (
     <div className="py-20 px-4" style={{ background: "#0f172a", borderTop: "2px solid #1e293b", borderBottom: "2px solid #1e293b" }}>
       <div className="max-w-5xl mx-auto">
@@ -33,7 +34,7 @@ export default function Featured() {
             >
               <div className="text-3xl shrink-0">{icon}</div>
               <div>
-                <div className="text-green-400 font-bold text-sm mb-1 uppercase tracking-wide">{title}</div>
+                <div className="font-bold text-sm mb-1 uppercase tracking-wide" style={{ color: primaryColor }}>{title}</div>
                 <div className="text-slate-500 text-xs leading-relaxed">{desc}</div>
               </div>
             </motion.div>
@@ -52,8 +53,8 @@ export default function Featured() {
           <div className="text-2xl mb-2">🎮</div>
           <p className="text-white font-bold text-lg mb-1 font-mc">Готов к игре?</p>
           <p className="text-slate-400 text-sm mb-4">Заходи на сервер и прокачай своего персонажа прямо сейчас</p>
-          <code className="text-green-400 font-bold text-lg tracking-widest px-4 py-2 inline-block" style={{ background: "#0f172a", border: "2px solid #4ade80" }}>
-            play.craftstore.ru
+          <code className="font-bold text-lg tracking-widest px-4 py-2 inline-block" style={{ color: primaryColor, background: "#0f172a", border: `2px solid ${primaryColor}` }}>
+            {serverIp}
           </code>
         </motion.div>
       </div>

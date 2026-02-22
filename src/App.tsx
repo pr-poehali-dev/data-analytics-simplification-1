@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,26 +9,38 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AuthModal from "./components/AuthModal";
 import AdminPanel from "./components/AdminPanel";
+import { api } from "./lib/api";
 
 const queryClient = new QueryClient();
 
-interface User {
-  username: string;
-  isAdmin: boolean;
+interface User { username: string; isAdmin: boolean; }
+interface SiteSettings {
+  serverName: string;
+  serverIp: string;
+  welcomeText: string;
+  primaryColor: string;
 }
+
+const DEFAULT_SETTINGS: SiteSettings = {
+  serverName: "CraftStore",
+  serverIp: "play.craftstore.ru",
+  welcomeText: "Добро пожаловать в лучший Minecraft-магазин!",
+  primaryColor: "#4ade80",
+};
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
   const [showAdmin, setShowAdmin] = useState(false);
-  const [activePromo, setActivePromo] = useState({ code: "VIP50", discount: 50 });
+  const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
+
+  useEffect(() => {
+    api.getSettings().then(res => {
+      if (res.serverName) setSettings(res as SiteSettings);
+    });
+  }, []);
 
   const handleAuth = (u?: User) => {
-    if (u) setUser(u);
-    else setUser({ username: "Гость", isAdmin: false });
-  };
-
-  const handlePromoChange = (code: string, discount: number) => {
-    setActivePromo({ code, discount });
+    setUser(u ?? { username: "Гость", isAdmin: false });
   };
 
   return (
@@ -43,7 +55,7 @@ const App = () => {
           {showAdmin && user?.isAdmin && (
             <AdminPanel
               onClose={() => setShowAdmin(false)}
-              onPromoChange={handlePromoChange}
+              onSettingsChange={s => setSettings(s)}
             />
           )}
         </AnimatePresence>
@@ -56,8 +68,7 @@ const App = () => {
                   username={user?.username}
                   isAdmin={user?.isAdmin}
                   onAdminClick={() => setShowAdmin(true)}
-                  promoCode={activePromo.code}
-                  promoDiscount={activePromo.discount}
+                  settings={settings}
                 />
               }
             />

@@ -6,31 +6,39 @@ import Featured from "@/components/Featured";
 import Promo from "@/components/Promo";
 import Footer from "@/components/Footer";
 
+interface SiteSettings {
+  serverName: string;
+  serverIp: string;
+  welcomeText: string;
+  primaryColor: string;
+}
+
 interface IndexProps {
   username?: string;
   isAdmin?: boolean;
   onAdminClick?: () => void;
-  promoCode?: string;
-  promoDiscount?: number;
+  settings?: SiteSettings;
 }
 
-export default function Index({ username, isAdmin, onAdminClick, promoCode, promoDiscount }: IndexProps) {
+export default function Index({ username, isAdmin, onAdminClick, settings }: IndexProps) {
   const shopRef = useRef<HTMLDivElement>(null);
 
   const scrollToShop = () => {
     shopRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const primaryColor = settings?.primaryColor || "#4ade80";
+
   return (
-    <main className="min-h-screen" style={{ background: "#0f172a" }}>
-      <Header username={username} isAdmin={isAdmin} onAdminClick={onAdminClick} />
-      <Hero username={username} onShopClick={scrollToShop} />
+    <main className="min-h-screen" style={{ background: "#0f172a", "--mc-green": primaryColor } as React.CSSProperties}>
+      <Header username={username} isAdmin={isAdmin} onAdminClick={onAdminClick} serverName={settings?.serverName} primaryColor={primaryColor} />
+      <Hero username={username} onShopClick={scrollToShop} welcomeText={settings?.welcomeText} serverName={settings?.serverName} primaryColor={primaryColor} />
       <div ref={shopRef}>
-        <Shop promoCode={promoCode} promoDiscount={promoDiscount} />
+        <Shop username={username} />
       </div>
-      <Featured />
+      <Featured serverIp={settings?.serverIp} primaryColor={primaryColor} />
       <Promo />
-      <Footer />
+      <Footer serverName={settings?.serverName} serverIp={settings?.serverIp} />
     </main>
   );
 }

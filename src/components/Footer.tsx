@@ -1,4 +1,5 @@
-export default function Footer() {
+interface FooterProps { serverName?: string; serverIp?: string; }
+export default function Footer({ serverName = "CraftStore", serverIp = "play.craftstore.ru" }: FooterProps) {
   return (
     <footer style={{ background: "#0a1628", borderTop: "2px solid #1e293b" }}>
       <div className="max-w-5xl mx-auto px-4 py-12">
@@ -6,7 +7,7 @@ export default function Footer() {
           <div className="col-span-2 sm:col-span-1">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-2xl">⛏️</span>
-              <span className="font-mc text-green-400 font-bold tracking-widest uppercase text-sm">CraftStore</span>
+              <span className="font-mc text-green-400 font-bold tracking-widest uppercase text-sm">{serverName}</span>
             </div>
             <p className="text-slate-500 text-xs leading-relaxed">
               Лучший Minecraft-магазин. Предметы, привилегии, питомцы — всё для игры мечты.
@@ -31,7 +32,7 @@ export default function Footer() {
             <h4 className="text-yellow-400 text-xs font-bold uppercase tracking-widest mb-3">Сервер</h4>
             <div className="mc-panel p-3 mb-3">
               <div className="text-xs text-slate-500 mb-1">IP сервера</div>
-              <code className="text-green-400 text-xs font-bold">play.craftstore.ru</code>
+              <code className="text-green-400 text-xs font-bold">{serverIp}</code>
             </div>
             <div className="flex gap-2">
               {["💬", "📢", "🎮"].map((icon, i) => (

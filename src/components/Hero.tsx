@@ -3,6 +3,9 @@ import { motion } from "framer-motion";
 interface HeroProps {
   username?: string;
   onShopClick?: () => void;
+  welcomeText?: string;
+  serverName?: string;
+  primaryColor?: string;
 }
 
 const STATS = [
@@ -11,7 +14,7 @@ const STATS = [
   { icon: "🛡️", label: "Довольных покупок", value: "32K+" },
 ];
 
-export default function Hero({ username, onShopClick }: HeroProps) {
+export default function Hero({ username, onShopClick, welcomeText, serverName, primaryColor = "#4ade80" }: HeroProps) {
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center pt-14 overflow-hidden">
       {/* Animated background grid */}
@@ -86,9 +89,9 @@ export default function Hero({ username, onShopClick }: HeroProps) {
           className="text-slate-400 text-lg md:text-xl mb-8 max-w-lg mx-auto"
         >
           {username ? (
-            <>Привет, <span className="text-green-400 font-bold">{username}</span>! Выбери себе предмет 👇</>
+            <>Привет, <span className="font-bold" style={{ color: primaryColor }}>{username}</span>! Выбери себе предмет 👇</>
           ) : (
-            "Лучший магазин предметов для Minecraft-сервера. Мечи, броня, привилегии и многое другое."
+            welcomeText || "Лучший магазин предметов для Minecraft-сервера. Мечи, броня, привилегии и многое другое."
           )}
         </motion.p>
 
@@ -101,7 +104,7 @@ export default function Hero({ username, onShopClick }: HeroProps) {
           <button
             onClick={onShopClick}
             className="mc-btn px-8 py-4 text-base font-bold uppercase tracking-widest text-black"
-            style={{ background: "#4ade80" }}
+            style={{ background: primaryColor }}
           >
             🛒 Открыть магазин
           </button>

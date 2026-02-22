@@ -1,0 +1,37 @@
+{
+  "tests": [
+    {
+      "name": "GET stats",
+      "method": "GET",
+      "path": "/?action=stats",
+      "expectedStatus": 200,
+      "expectedBody": {"today": {}, "total": {}},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "GET promos",
+      "method": "GET",
+      "path": "/?action=promos",
+      "expectedStatus": 200,
+      "expectedBody": {"promos": []},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "GET settings",
+      "method": "GET",
+      "path": "/?action=settings",
+      "expectedStatus": 200,
+      "expectedBody": {"serverName": "CraftStore"},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Validate promo VIP50",
+      "method": "POST",
+      "path": "/?action=validate-promo",
+      "body": {"code": "VIP50"},
+      "expectedStatus": 200,
+      "expectedBody": {"valid": true, "discount": 50},
+      "bodyMatcher": "partial"
+    }
+  ]
+}
